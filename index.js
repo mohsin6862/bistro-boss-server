@@ -10,7 +10,7 @@ app.use(cors())
 app.use(express.json())
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.USER_ID}:${process.env.USER_PASS}@mohsin.hrlaneq.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -43,9 +43,30 @@ async function run() {
       res.send(result)
      })
 
+
+     app.get('/cart',async(req,res)=>{
+      const email = req.query.email;
+      if(!email){
+        res.send([])
+      }
+
+        const query = { email: email };
+        const result = await cartCollection.find(query).toArray()
+        res.send(result)
+
+
+     })
+
      app.post('/cart', async(req,res)=>{
       const item = req.body;
       const result = await cartCollection.insertOne(item);
+      res.send(result)
+     })
+
+     app.delete('/cart/:id', async(req,res)=>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await cartCollection.deleteOne(query)
       res.send(result)
      })
 
